@@ -1,0 +1,34 @@
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+
+
+# 1 control plane node and 4 workers
+nodes:
+# the control plane node config
+- role: control-plane
+# the three workers
+- role: worker
+start iris
+name storage
+image dl_iris_dataset
+python3 datapreprocess.py
+
+- role: worker
+start keras_alone
+name model
+image keras/alone:latest
+python3 create_keras_model.py 
+python3 train_model.py
+
+- role: worker
+start keras_alone2 #this just say make 2 replicas of keras_alone, but give different names
+name optimizer
+image keras/alone:latest
+python3 optimize.py
+
+- role: worker
+start eval
+name eval
+image keras/alone:latest
+python3 evaluation.py
+
